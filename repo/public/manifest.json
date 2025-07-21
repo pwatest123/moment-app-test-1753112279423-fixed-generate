@@ -1,0 +1,25 @@
+{
+  "short_name": "Expense-App",
+  "name": "Expense-App - Track your spending",
+  "icons": [
+    {
+      "src": "https://idonotwritecode.com/wp-content/uploads/2025/04/my-notion-face-transparent.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://idonotwritecode.com/wp-content/uploads/2025/04/my-notion-face-transparent.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "categories": ["finance", "utilities"],
+  "description": "Track expenses for groceries, rent, bills with photo capture"
+}

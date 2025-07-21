@@ -1,0 +1,14 @@
+{
+  "name": "moment-pwa-app",
+  "version": "1.0.0",
+  "description": "Generated PWA by Apps for the Moment",
+  "main": "public/index.html",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "start": "echo 'App ready for deployment'",
+    "dev": "echo 'Development mode'"
+  },
+  "keywords": ["pwa", "progressive-web-app", "offline-first"],
+  "author": "Apps for the Moment",
+  "license": "MIT"
+}

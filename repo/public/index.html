@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Track expenses for groceries, rent, bills with photo capture" />
+    <link rel="icon" href="https://idonotwritecode.com/wp-content/uploads/2025/04/my-notion-face-transparent.png" />
+    <link rel="apple-touch-icon" href="https://idonotwritecode.com/wp-content/uploads/2025/04/my-notion-face-transparent.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Expense-App</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background: #121212;
+            color: #E0E0E0;
+        }
+        .app {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Dark mode styles */
+        :root {
+            --surface-1: #1E1E1E;
+            --surface-2: #2D2D2D;
+            --text-primary: #E0E0E0;
+            --text-secondary: #A0A0A0;
+            --accent-1: #BB86FC;
+            --accent-2: #03DAC6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .expense-form {
+            background: var(--surface-1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--surface-2);
+            border-radius: 5px;
+            font-size: 16px;
+            background: var(--surface-2);
+            color: var(--text-primary);
+        }
+        input:focus, select:focus {
+            border-color: var(--accent-1);
+            outline: none;
+        }
+        button {
+            background: var(--accent-1);
+            color: var(--text-primary);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .camera-button {
+            background: var(--accent-2);
+            margin-top: 10px;
+        }
+        .expense-list {
+            margin-top: 30px;
+        }
+        .expense-item {
+            background: var(--surface-1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--surface-2);
+        }
+        .offline-banner {
+            display: none;
+            background: #FFD60A;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .photo-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--surface-2);
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-tab.active {
+            color: var(--accent-1);
+            border-bottom-color: var(--accent-1);
+        }
+        .calendar-view {
+            background: var(--surface-1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        .calendar-nav button {
+            width: auto;
+            padding: 5px 15px;
+            background: var(--surface-2);
+        }
+        .expense-total {
+            color: var(--accent-2);
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <img src="https://idonotwritecode.com/wp-content/uploads/2025/04/my-notion-face-transparent.png" 
+                 alt="Expense App Logo" 
+                 width="64" 
+                 height="64" />
+            <h1>Expense-App</h1>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchView('form')">Add Expense</div>
+            <div class="nav-tab" onclick="switchView('calendar')">Calendar</div>
+        </div>
+
+        <div class="calendar-view" id="calendarView">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button onclick="changeMonth(-1)">Previous</button>
+                    <h2 id="currentMonth"></h2>
+                    <button onclick="changeMonth(1)">Next</button>
+                </div>
+                <div class="expense-total" id="monthTotal"></div>
+            </div>
+            <div id="calendarExpenses"></div>
+        </div>
+
+        <div class="expense-form">
+            <div class="input-group">
+                <label for="category">Category</label>
+                <select id="category">
+                    <option value="groceries">Groceries</option>
+                    <option value="rent">Rent</option>
+                    <option value="bills">Bills</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" placeholder="Enter amount" step="0.01" min="0" required />
+            </div>
+
+            <div class="input-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" placeholder="Enter description" required />
+            </div>
+
+            <button onclick="addExpense()">Add Expense</button>
+            <button class="camera-button" onclick="takePicture()">Take Receipt Photo</button>
+            <img id="photoPreview" class="photo-preview" alt="Receipt preview" />
+        </div>
+
+        <div class="expense-list" id="expenseList"></div>
+    </div>
+
+    <div class="offline-banner" id="offlineBanner">
+        You are currently offline. Changes will be saved when you're back online.
+    </div>
+
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => console.log('ServiceWorker registered'))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
+
+        // Check online status
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        function updateOnlineStatus() {
+            const banner = document.getElementById('offlineBanner');
+            banner.style.display = navigator.onLine ? 'none' : 'block';
+        }
+
+        // Initialize expenses from localStorage
+        let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+        let currentDate = new Date();
+        renderExpenses();
+        updateCalendarView();
+
+        function switchView(view) {
+            const formView = document.querySelector('.expense-form');
+            const calendarView = document.getElementById('calendarView');
+            const tabs = document.querySelectorAll('.nav-tab');
+            
+            if (view === 'form') {
+                formView.style.display = 'block';
+                calendarView.style.display = 'none';
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                formView.style.display = 'none';
+                calendarView.style.display = 'block';
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+                updateCalendarView();
+            }
+        }
+
+        function updateCalendarView() {
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+            
+            document.getElementById('currentMonth').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            
+            const monthExpenses = expenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate >= monthStart && expenseDate <= monthEnd;
+            });
+
+            const totalAmount = monthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            document.getElementById('monthTotal').textContent = `Total: ${totalAmount.toFixed(2)}`;
+
+            const groupedExpenses = monthExpenses.reduce((groups, expense) => {
+                const date = new Date(expense.date).toLocaleDateString();
+                if (!groups[date]) groups[date] = [];
+                groups[date].push(expense);
+                return groups;
+            }, {});
+
+            document.getElementById('calendarExpenses').innerHTML = 
+                Object.entries(groupedExpenses)
+                    .map(([date, dayExpenses]) => `
+                        <div class="expense-item">
+                            <div>
+                                <strong>${date}</strong>
+                                <p>${dayExpenses.length} expense(s)</p>
+                            </div>
+                            <div>
+                                <strong>${dayExpenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}</strong>
+                            </div>
+                        </div>
+                    `).join('');
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            updateCalendarView();
+        }
+
+        function addExpense() {
+            const category = document.getElementById('category').value;
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('description').value;
+            const photoPreview = document.getElementById('photoPreview');
+            const photoSrc = photoPreview.style.display !== 'none' ? photoPreview.src : null;
+
+            if (!amount || !description) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const expense = {
+                id: Date.now(),
+                category,
+                amount: parseFloat(amount),
+                description,
+                photo: photoSrc,
+                date: new Date().toISOString()
+            };
+
+            expenses.unshift(expense);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            renderExpenses();
+
+            // Reset form
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            photoPreview.style.display = 'none';
+            photoPreview.src = '';
+        }
+
+        function renderExpenses() {
+            const list = document.getElementById('expenseList');
+            list.innerHTML = expenses.map(expense => `
+                <div class="expense-item">
+                    <div>
+                        <strong>${expense.category}</strong>
+                        <p>${expense.description}</p>
+                        ${expense.photo ? `<img src="${expense.photo}" alt="Receipt" style="width: 50px; height: 50px; object-fit: cover;">` : ''}
+                    </div>
+                    <div>
+                        <strong>$${expense.amount.toFixed(2)}</strong>
+                        <p>${new Date(expense.date).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function takePicture() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                await video.play();
+
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+
+                stream.getTracks().forEach(track => track.stop());
+
+                const photoPreview = document.getElementById('photoPreview');
+                photoPreview.src = canvas.toDataURL('image/jpeg');
+                photoPreview.style.display = 'block';
+
+                // Cache the photo
+                canvas.toBlob(blob => {
+                    const photoId = Date.now();
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'CACHE_PHOTO',
+                        id: photoId,
+                        blob: blob
+                    });
+                });
+            } catch (err) {
+                alert('Error accessing camera: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
