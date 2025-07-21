@@ -1,6 +1,6 @@
 {
-  "short_name": "Expense-App",
-  "name": "Expense-App - Track your spending",
+  "short_name": "Expense-App Test",
+  "name": "Expense-App - Track your spending - Test Edited",
   "icons": [
     {
       "src": "https://idonotwritecode.com/wp-content/uploads/2025/04/my-notion-face-transparent.png",
@@ -20,6 +20,9 @@
   "theme_color": "#000000",
   "background_color": "#ffffff",
   "orientation": "portrait",
-  "categories": ["finance", "utilities"],
-  "description": "Track expenses for groceries, rent, bills with photo capture"
+  "categories": [
+    "finance",
+    "utilities"
+  ],
+  "description": "Track expenses for groceries, rent, bills with photo capture [Test Edit: Add a purple background and change the title to Fixed Generate Test]"
 }
